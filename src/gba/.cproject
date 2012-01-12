@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?>
+
+<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.toolchain.base.1562042005">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.toolchain.base.1562042005" moduleId="org.eclipse.cdt.core.settings" name="Default">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.qnx.tools.ide.qde.core.QDELinkerErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration buildProperties="" id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.toolchain.base.1562042005" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.toolchain.base.1562042005.187979723" name="/" resourcePath="">
+						<toolChain id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.toolchain.base.1247425123" name="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.toolchain.base" superClass="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.toolchain.base">
+							<targetPlatform id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.target.platform.base.829911547" name="SDP 1.0 GCC arm-unknown-nto-qnx6.5.0eabi 4.4.2 Target Platform (ARM)" superClass="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.target.platform.base"/>
+							<builder buildPath="${workspace_loc:/gba/Default}" id="qnx.custom.target.builder.86959227" managedBuildOn="false" name="CDT Internal Builder.Default" superClass="qnx.custom.target.builder"/>
+							<tool id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.archiver.base.1005227754" name="SDP 1.0 GCC arm-unknown-nto-qnx6.5.0eabi 4.4.2 Archiver (ARM)" superClass="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.archiver.base"/>
+							<tool id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.cpp.compiler.base.2046827508" name="SDP 1.0 GCC arm-unknown-nto-qnx6.5.0eabi 4.4.2 C++ Compiler (ARM)" superClass="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.cpp.compiler.base"/>
+							<tool id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.c.compiler.base.878249576" name="SDP 1.0 GCC arm-unknown-nto-qnx6.5.0eabi 4.4.2 C Compiler (ARM)" superClass="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.c.compiler.base"/>
+							<tool id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.c.linker.base.693566523" name="SDP 1.0 GCC arm-unknown-nto-qnx6.5.0eabi 4.4.2 Linker (ARM)" superClass="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.c.linker.base"/>
+							<tool id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.cpp.linker.base.1772488993" name="SDP 1.0 GCC arm-unknown-nto-qnx6.5.0eabi 4.4.2 C++ Linker (ARM)" superClass="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.cpp.linker.base"/>
+							<tool id="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.assembler.base.2133062487" name="SDP 1.0 GCC arm-unknown-nto-qnx6.5.0eabi 4.4.2 Assembler (ARM)" superClass="qnx.custom.SDP_1_0_GCC_arm_unknown_nto_qnx6_5_0eabi_4_4_2.gcc.nto.arm.assembler.base"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="gba.null.668364008" name="gba"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.qnx.tools.ide.qde.managedbuilder.core.qccScannerInfo"/>
+	</storageModule>
+</cproject>

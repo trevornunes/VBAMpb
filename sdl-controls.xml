@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<emulation version="1">
+
+ <key x="20" y="110" width="16" height="16" sym="273" scancode="273">
+ <label x="0" y="0" width="16" height="16" image="up.png"/>
+ </key>
+ 
+ <key x="20" y="130" width="16" height="16" sym="274" scancode="274">
+ <label x="0" y="0" width="16" height="16" image="down.png"/>
+ </key>
+ 
+ <key x="5" y="120" width="16" height="16" sym="276" scancode="276">
+ <label x="0" y="0" width="16" height="16" image="left.png"/>
+ </key>
+ 
+ <key x="35" y="120" width="16" height="16" sym="275" scancode="275">
+<label x="0" y="0" width="16" height="16" image="right.png" />
+</key>
+
+<key x="90" y="120" width="30" height="30" sym="8" scancode="8">
+<label x="0" y="0" width="30" height="30" image="select.png"/>
+</key>
+
+<key x="120" y="120" width="30" height="30" sym="13" scancode="13">
+<label x="0" y="0" width="30" height="30" image="start.png"/>
+</key>
+
+<key x="170" y="120" width="32" height="32" sym="120" scancode="120">
+<label x="0" y="0" width="24" height="24" image="B.png"/>
+</key>
+
+<key x="200" y="120" width="32" height="32" sym="122" scancode="122">
+<label x="0" y="0" width="24" height="24" image="A.png"/>
+</key>
+
+<key x="200" y="75" width="32" height="32" sym="115" scancode="122">
+<label x="0" y="0" width="32" height="32" image="A.png"/>
+</key>
+
+<key x="160" y="75" width="32" height="32" sym="97" scancode="120">
+<label x="0" y="0" width="32" height="32" image="B.png"/>
+</key>
+
+<key x="0" y="0" width="25" height="25" sym="48" scancode="48"/>
+
+</emulation>
