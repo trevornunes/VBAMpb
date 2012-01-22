@@ -122,14 +122,15 @@ int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
 int srcPitch = 0;
-int srcWidth = 0;
-int srcHeight = 0;
+int srcWidth =  320;
+int srcHeight = 256;
 int destWidth = 0;
 int destHeight = 0;
 int desktopWidth = 0;
 int desktopHeight = 0;
 
-Filter filter = kStretch2x;
+Filter filter = kStretch1x;
+
 u8 *delta = NULL;
 
 int filter_enlarge = 0;
@@ -1157,8 +1158,8 @@ void sdlReadBattery()
 
 void sdlReadDesktopVideoMode() {
   const SDL_VideoInfo* vInfo = SDL_GetVideoInfo();
-  desktopWidth  = vInfo->current_w/4;  // 1024 for pb
-  desktopHeight = vInfo->current_h/4;  // 600  for pb
+  desktopWidth  = vInfo->current_w;  // 1024 for pb
+  desktopHeight = vInfo->current_h;  // 600  for pb
 }
 
 void sdlInitVideo() {
@@ -1187,7 +1188,7 @@ void sdlInitVideo() {
     screenHeight = destHeight;
   }
 #else
- flags = SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF;
+ flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
 
  screenWidth  = destWidth;
  screenHeight = destHeight;
@@ -1195,7 +1196,7 @@ void sdlInitVideo() {
  fprintf(stderr,"sdlInitVideo: %d x %d\n", screenWidth, screenHeight);
 #endif
 
-  surface = SDL_SetVideoMode(screenWidth, screenHeight,0, flags);
+  surface = SDL_SetVideoMode(screenWidth, screenHeight,32, flags);
 
   if(surface == NULL) {
     fprintf(stderr,"surface is NULL!\n");
@@ -2350,7 +2351,7 @@ int main(int argc, char **argv)
   filterFunction = initFilter(filter, systemColorDepth, srcWidth);
   if (!filterFunction) {
     fprintf(stderr,"Unable to init filter '%s'\n", getFilterName(filter));
-    exit(-1);
+   // exit(-1);
   }
 
   if(systemColorDepth == 15)
@@ -2539,9 +2540,7 @@ void systemDrawScreen()
 #endif
   {
     screen = (u8*)surface->pixels;
-#ifndef __QNXNTO__
     SDL_LockSurface(surface);
-#endif
   }
 
   if (ifbFunction)
@@ -2584,9 +2583,7 @@ void systemDrawScreen()
     SDL_Flip(surface);
   }
 #else
-#ifndef __QNXNTO__
 SDL_UnlockSurface(surface);
-#endif
   SDL_Flip(surface);
 #endif
 

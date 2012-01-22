@@ -19,7 +19,7 @@
          Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.
          An updated version of application must have a versionNumber value higher than the previous version. Required. -->
     <versionNumber>1.0.0</versionNumber>
-    <buildId>2</buildId>
+    <buildId>3</buildId>
 
     <!-- Fourth digit segment of the package version. First three segments are taken from the 
          <versionNumber> element.  Must be an integer from 0 to 2^16-1 -->
@@ -37,7 +37,6 @@
     <!--  Name of author which is used for signing. Must match the developer name of your development certificate. -->
     <author>t</author>
     <authorId>gYAAgOKRaqVbNM5ToziNoZFV720</authorId>
-    <splashscreen>gba_froggy.png</splashscreen>
     
     <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
     <!-- <authorId>ABC1234YjsnUk235h</authorId> -->
@@ -48,7 +47,7 @@
     </initialWindow>
     
     <!--  The category where the application appears. Either core.games or core.media. -->
-    <category>core.media</category>
+    <category>core.games</category>
     <configuration id="com.qnx.qcc.configuration.exe.debug.804636892" name="Device-Debug">
        <asset path="Device-Debug/VBAMpb" entry="true" type="Qnx/Elf">VBAMpb</asset>
     </configuration>
@@ -71,20 +70,16 @@
        <asset path="Simulator-Coverage/VBAMpb" entry="true" type="Qnx/Elf">VBAMpb</asset>
     </configuration>
     <asset path="sdl-controls.xml">sdl-controls.xml</asset>
-    <asset path="${QNX_TARGET}\..\target-override\armle-v7\usr\lib\libbps.so" type="Qnx/Elf">lib/libbps.so.1</asset>
     <asset path="media/A.png">A.png</asset>
     <asset path="media/B.png">B.png</asset>
-    <asset path="media/down.png">down.png</asset>
-    <asset path="media/left.png">left.png</asset>
-    <asset path="media/right.png">right.png</asset>
     <asset path="media/select.png">select.png</asset>
     <asset path="media/start.png">start.png</asset>
-    <asset path="media/up.png">up.png</asset>
     <asset path="media/nes.png">nes.png</asset>
     <asset path="3rdparty/libs/libSDL12.so" type="Qnx/Elf">lib/libSDL12.so</asset>
     <asset path="3rdparty/libs/libTouchControlOverlay.so" type="Qnx/Elf">lib/libTouchControlOverlay.so</asset>
     <asset path="media/gba_froggy.png">gba_froggy.png</asset>
     <asset path="media/gba_froggy_icon.png">gba_froggy_icon.png</asset>
+    <asset path="media/dpad.png">dpad.png</asset>
     
     <!--  The icon for the application, which should be 86x86. -->
     <icon>

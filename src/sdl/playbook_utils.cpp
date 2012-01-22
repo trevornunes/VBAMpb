@@ -14,9 +14,9 @@ static const char *romPath_xxx = "/accounts/1000/shared/misc/roms";
 static const char *romPath_nes = "/accounts/1000/shared/misc/roms/nes";
 static const char *romPath_gba = "/accounts/1000/shared/misc/roms/gba";
 
+//*********************************************************
 //
-//
-//
+//*********************************************************
 PlaybookRom::PlaybookRom(rom_type_t rtype)
 {
   activeRom_m = "";
@@ -39,11 +39,14 @@ PlaybookRom::PlaybookRom(rom_type_t rtype)
               break;
   }
 
-  // root parth is now set ...
+  // root path is now set ...
 
 }
 
 
+//*********************************************************
+//
+//*********************************************************
 bool PlaybookRom::pathExists(string dpath)
 {
 	if( opendir(dpath.c_str() ) == NULL)
@@ -67,12 +70,9 @@ void PlaybookRom::setRomPath(string dpath)
 //*********************************************************
 vector<string> PlaybookRom::getRomList( void )
 {
- //vector<string> vsList;
 
-#ifdef __QNXNTO__
 	DIR* dirp;
 	struct dirent* direntp;
-#endif
 
 	if(activeRomPath_m == "")
 	{
@@ -80,7 +80,6 @@ vector<string> PlaybookRom::getRomList( void )
 		return activeRomList_vsm;
 	}
 
-#ifdef __QNXNTO__
   dirp = opendir( activeRomPath_m.c_str() );
   if( dirp != NULL )
   {
@@ -117,7 +116,6 @@ vector<string> PlaybookRom::getRomList( void )
 	fprintf(stderr,"dirp is NULL ...\n");
   }
 
-#endif
  fprintf(stderr,"number of files %d\n", activeRomList_vsm.size() );
  return activeRomList_vsm;
 }
@@ -125,9 +123,10 @@ vector<string> PlaybookRom::getRomList( void )
 
 
 
+
+//*********************************************************
 //
-// Automatically iterate through a dir for roms.
-//
+//*********************************************************
 const char *PlaybookRom::getRomNext(void)
 {
     int status = 0;
