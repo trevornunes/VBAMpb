@@ -84,6 +84,10 @@
 #include <lirc/lirc_client.h>
 #endif
 
+#ifdef __QNXNTO__
+#include "playbook_utils.h"
+#endif
+
 extern void remoteInit();
 extern void remoteCleanUp();
 extern void remoteStubMain();
@@ -1188,7 +1192,7 @@ void sdlInitVideo() {
     screenHeight = destHeight;
   }
 #else
- flags = SDL_HWSURFACE | SDL_DOUBLEBUF;
+ flags = SDL_HWSURFACE | SDL_HWPALETTE | SDL_DOUBLEBUF;
 
  screenWidth  = destWidth;
  screenHeight = destHeight;
@@ -1388,12 +1392,14 @@ void sdlPollEvents()
     case SDL_QUIT:
       emulating = 0;
       break;
+#ifndef _QNXNTO__
     case SDL_VIDEORESIZE:
       if (ignore_first_resize_event)
       {
 	      ignore_first_resize_event	= 0;
 	      break;
       }
+#endif
 #ifndef NO_OGL
       if (openGL)
       {
@@ -1402,8 +1408,8 @@ void sdlPollEvents()
                        (fullscreen ? SDL_FULLSCREEN : 0));
         sdlOpenGLInit(event.resize.w, event.resize.h);
       }
-#endif
       break;
+#endif
     case SDL_ACTIVEEVENT:
       if(pauseWhenInactive && (event.active.state & SDL_APPINPUTFOCUS)) {
         active = event.active.gain;
@@ -1912,7 +1918,7 @@ int main(int argc, char **argv)
 
   int op = -1;
 
-  frameSkip = 2;
+  frameSkip = 1;
   gbBorderOn = 0;
 
   parseDebug = false;
@@ -1927,14 +1933,20 @@ int main(int argc, char **argv)
 
 #ifndef _WIN32
   // Get home dir
+
   char *vbaPath = "/accounts/1000/shared/misc/vbampb";
+
+  mkdir("/accounts/1000/shared/misc/roms/gba",0777);
+  mkdir("/accounts/1000/shared/misc/vbam",0777);
+
   homeDir = vbaPath;
   useBios = true;
   strcpy(biosFileName, "/accounts/1000/shared/misc/roms/gba/gba_bios.bin");
   snprintf(buf, 1024, "%s/%s", homeDir, DOT_DIR);
   // Make dot dir if not existent
+
   if (stat(buf, &s) == -1 || !S_ISDIR(s.st_mode))
-    mkdir(buf, 0755);
+      mkdir(buf, 0755);
 #endif
 
   sdlReadPreferences();
@@ -2141,6 +2153,7 @@ int main(int argc, char **argv)
   rtcEnable(sdlRtcEnable ? true : false);
   agbPrintEnable(sdlAgbPrint ? true : false);
 
+
 //#ifndef __QNXNTO__
   if(!debuggerStub) {
     if(optind >= argc) {
@@ -2154,8 +2167,6 @@ int main(int argc, char **argv)
  //char *szFile ="/accounts/1000/shared/misc/roms/gba/game.gba";
 //#endif
 
-
-
   for(int i = 0; i < 24;) {
     systemGbPalette[i++] = (0x1f) | (0x1f << 5) | (0x1f << 10);
     systemGbPalette[i++] = (0x15) | (0x15 << 5) | (0x15 << 10);
@@ -2165,22 +2176,33 @@ int main(int argc, char **argv)
 
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
-  if(optind < argc) {
-    char *szFile = argv[optind];
-    u32 len = strlen(szFile);
+  if(1) {
+#ifdef __QNXNTO__
+	     PlaybookRom pbrom( PlaybookRom::rom_gba_c );
+	     pbrom.getRomList();
+	   // (void) pbrom.getRomNext();
+	     const char *firstRomName = pbrom.getRomNext();
+	     char *szFile = (char *) firstRomName;
+#else
+	     char *szFile = argv[optind];
+#endif
+
+    fprintf(stderr,"szFile = %s\n", firstRomName);
+
+	u32 len = strlen(szFile);
     if (len > SYSMSG_BUFFER_SIZE)
     {
       fprintf(stderr,"%s :%s: File name too long\n",argv[0],szFile);
       exit(-1);
     }
+/*
 
-    utilStripDoubleExtension(szFile, filename);
-    char *p = strrchr(filename, '.');
+     utilStripDoubleExtension(szFile, filename);
+     char *p = strrchr(filename, '.');
 
     if(p)
       *p = 0;
 
-    fprintf(stderr,"autopatch ...\n");
 
     if (sdlAutoPatch && sdl_patch_num == 0)
     {
@@ -2203,14 +2225,21 @@ int main(int argc, char **argv)
       sdl_patch_names[sdl_patch_num] = tmp;
       sdl_patch_num++;
     }
-    fprintf(stderr,"soundInit..\n");
 
+*/
+    fprintf(stderr,"soundInit..\n");
     soundInit();
 
     bool failed = false;
+
     fprintf(stderr,"szFile = %s\n", szFile);
 
-    IMAGE_TYPE type = utilFindType(szFile);
+    if(strlen(szFile) <= 4)
+    {
+      fprintf(stderr," ROM file is invalid ...\n");
+      exit(-1);
+    }
+     IMAGE_TYPE type = utilFindType(szFile);
 
      fprintf(stderr,"'%s' type = %d\n",szFile, type);
 
@@ -2515,9 +2544,9 @@ void drawScreenMessage(u8 *screen, int pitch, int x, int y, unsigned int duratio
 void drawSpeed(u8 *screen, int pitch, int x, int y)
 {
   char buffer[50];
-  if(showSpeed == 1)
-    sprintf(buffer, "%d%%", systemSpeed);
-  else
+ // if(showSpeed == 1)
+//    sprintf(buffer, "%d%%", systemSpeed);
+ // else
     sprintf(buffer, "%3d%%(%d, %d fps)", systemSpeed,
             systemFrameSkip,
             showRenderedFrames);
@@ -2525,7 +2554,6 @@ void drawSpeed(u8 *screen, int pitch, int x, int y)
   drawText(screen, pitch, x, y, buffer, showSpeedTransparent);
 }
 
-// QNX/PB removed screen lock,unlocking ..
 void systemDrawScreen()
 {
   unsigned int destPitch = destWidth * (systemColorDepth >> 3);
@@ -2543,16 +2571,21 @@ void systemDrawScreen()
     SDL_LockSurface(surface);
   }
 
+#ifndef __QNXNTO__
+  // froggyface - temporary don't need blur etc for now ...
   if (ifbFunction)
     ifbFunction(pix + srcPitch, srcPitch, srcWidth, srcHeight);
+#endif
 
   filterFunction(pix + srcPitch, srcPitch, delta, screen,
                  destPitch, srcWidth, srcHeight);
 
   drawScreenMessage(screen, destPitch, 10, destHeight - 20, 3000);
 
+#ifndef __QNXNTO__
   if (showSpeed && fullscreen)
     drawSpeed(screen, destPitch, 10, 20);
+#endif
 
 #ifndef NO_OGL
   if (openGL) {
@@ -2583,7 +2616,7 @@ void systemDrawScreen()
     SDL_Flip(surface);
   }
 #else
-SDL_UnlockSurface(surface);
+  SDL_UnlockSurface(surface);
   SDL_Flip(surface);
 #endif
 

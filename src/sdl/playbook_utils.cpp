@@ -13,6 +13,8 @@
 static const char *romPath_xxx = "/accounts/1000/shared/misc/roms";
 static const char *romPath_nes = "/accounts/1000/shared/misc/roms/nes";
 static const char *romPath_gba = "/accounts/1000/shared/misc/roms/gba";
+static const char *romPath_pce = "/accounts/1000/shared/misc/roms/pce";
+
 
 //*********************************************************
 //
@@ -35,6 +37,10 @@ PlaybookRom::PlaybookRom(rom_type_t rtype)
     	 activeRomPath_m = romPath_gba;
          break;
 
+    case rom_pce_c:
+    	 activeRomPath_m = romPath_pce;
+    	 break;
+
     default:  activeRomPath_m = romPath_xxx;
               break;
   }
@@ -49,11 +55,16 @@ PlaybookRom::PlaybookRom(rom_type_t rtype)
 //*********************************************************
 bool PlaybookRom::pathExists(string dpath)
 {
-	if( opendir(dpath.c_str() ) == NULL)
+	DIR *dp =0;
+	if( (dp=opendir(dpath.c_str())) == NULL) {
+		closedir(dp);
 		return false;
-	else
+	}
+	 else
+	{
+		closedir(dp);
 		return true;
-
+	}
 }
 
 void PlaybookRom::setRomPath(string dpath)
@@ -89,9 +100,8 @@ vector<string> PlaybookRom::getRomList( void )
 		if( direntp == NULL )
 		  break;
 
-		 fprintf(stderr,"FILE: '%s' \n", direntp->d_name);
-		// FCEUI_DispMessage(direntp->d_name,0);
-		  string tmp = direntp->d_name;
+		// fprintf(stderr,"FILE: '%s' \n", direntp->d_name);
+   	     string tmp = direntp->d_name;
 
 		  if( strcmp( direntp->d_name, ".") == 0)
 		  {
@@ -104,9 +114,11 @@ vector<string> PlaybookRom::getRomList( void )
 
 		  if( (tmp.substr(tmp.find_last_of(".") + 1) == "nes") ||
 			  (tmp.substr(tmp.find_last_of(".") + 1) == "NES") ||
-			  (tmp.substr(tmp.find_last_of(".") + 1) == "gba") )
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "gba") ||
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "pce") ||
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "zip") )
 		  {
-	         // fprintf(stderr,"ROM: %s\n", direntp->d_name);
+	          fprintf(stderr,"ROM: %s\n", direntp->d_name);
 			  activeRomList_vsm.push_back(direntp->d_name);
 		  }
 	 }
@@ -115,6 +127,8 @@ vector<string> PlaybookRom::getRomList( void )
   {
 	fprintf(stderr,"dirp is NULL ...\n");
   }
+
+ // sort list here .
 
  fprintf(stderr,"number of files %d\n", activeRomList_vsm.size() );
  return activeRomList_vsm;
@@ -130,7 +144,10 @@ vector<string> PlaybookRom::getRomList( void )
 const char *PlaybookRom::getRomNext(void)
 {
     int status = 0;
-    fprintf(stderr,"AutoLoadRom: %d", romType_m);
+    fprintf(stderr,"AutoLoadRom: %d\n", romType_m);
+    static char romName[128];
+
+    memset(romName,0,128);
 
 	if( activeRomList_vsm.size() == 0)
 	{
@@ -148,11 +165,12 @@ const char *PlaybookRom::getRomNext(void)
     	activeRomIndex_m = 0;
 
     activeRom_m = activeRomList_vsm[activeRomIndex_m];
-    string   baseDir = activeRomPath_m + activeRomList_vsm[activeRomIndex_m];
+    string baseDir = activeRomPath_m + "/" + activeRomList_vsm[activeRomIndex_m];
+
+    sprintf(romName,"%s",baseDir.c_str());
 
     fprintf(stderr,"loading: %d/%d '%s'\n", activeRomIndex_m, activeRomList_vsm.size(), baseDir.c_str() );
-
-    return baseDir.c_str();
+    return romName;
 }
 
 

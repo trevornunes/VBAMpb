@@ -21,7 +21,7 @@ extern int emulating;
 extern bool speedup;
 
 // Hold up to 100 ms of data in the ring buffer
-const float SoundSDL::_delay = 0.2f;
+const float SoundSDL::_delay = 0.1f;
 
 SoundSDL::SoundSDL():
 	_rbuf(0),
@@ -94,8 +94,8 @@ bool SoundSDL::init(long sampleRate)
 	audio.freq = sampleRate;
 	audio.format = AUDIO_S16SYS;
 	audio.channels = 2;
-//	audio.samples = 1024;
-	audio.samples = 4096;
+	audio.samples = 1024;
+//	audio.samples = 4096;
 	audio.callback = soundCallback;
 	audio.userdata = this;
 

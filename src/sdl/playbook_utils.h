@@ -19,12 +19,15 @@ class PlaybookRom {
 
 public:
 
+
 typedef enum {
-	rom_nes_c = 0,
-	rom_gba_c = 1
+		rom_nes_c = 0,
+		rom_gba_c = 1,
+		rom_pce_c
 }rom_type_t;
 
 PlaybookRom();
+
 PlaybookRom(rom_type_t rtype);
 
 bool           pathExists(string dpath);
