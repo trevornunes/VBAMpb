@@ -252,6 +252,63 @@ u32  screenMessageTime = 0;
 
 char *arg0;
 
+
+PlaybookRom  PBROM(PlaybookRom::rom_gba_c);
+
+
+int g_LOADING_ROM;
+extern bool stopState;  // cpu loop control
+bool RomLoad( const char *fname)
+{
+  int failed;
+  int size = 0;
+  static int load_in_progress = 0;
+
+  if(load_in_progress)
+	  return false;
+
+  if(!fname)
+	  return false;
+
+  g_LOADING_ROM = 1;
+  stopState = true;
+
+  load_in_progress = 1;
+  CPUCleanUp();         // free dynamic allocated mem etc.
+  fprintf(stderr,"RomLoad: CPULoadRom\n");
+
+  if( (size=CPULoadRom(fname)) == 0)
+  {
+	fprintf(stderr,"RomLoad: error in CPULoadRom for %s",fname);
+    return false;
+  }
+
+ // sdlApplyPerImagePreferences();
+ // doMirroring(mirroringEnable);
+
+  cartridgeType = 0;
+  emulator = GBASystem;
+
+  fprintf(stderr,"RomLoad: CPUInit '%s' %d\n", biosFileName, useBios);
+
+  stopState = false;
+  CPUInit(biosFileName, 1);
+
+  /*
+  int patchnum;
+  for (patchnum = 0; patchnum < sdl_patch_num; patchnum++) {
+    fprintf(stdout, "Trying patch %s%s\n", sdl_patch_names[patchnum],
+      applyPatch(sdl_patch_names[patchnum], &rom, &size) ? " [success]" : "");
+  }
+  */
+  fprintf(stderr,"RomLoad: CPUReset\n");
+
+  CPUReset();
+  fprintf(stderr,"RomLoad: ok\n");
+  load_in_progress = 0;
+  systemScreenMessage( PBROM.getActiveRomName().c_str() );
+}
+
 int sdlPreparedCheats	= 0;
 #define MAX_CHEATS 100
 const char * sdlPreparedCheatCodes[MAX_CHEATS];
@@ -1164,6 +1221,7 @@ void sdlReadDesktopVideoMode() {
   const SDL_VideoInfo* vInfo = SDL_GetVideoInfo();
   desktopWidth  = vInfo->current_w;  // 1024 for pb
   desktopHeight = vInfo->current_h;  // 600  for pb
+  PBROM.updateRomList();
 }
 
 void sdlInitVideo() {
@@ -1680,6 +1738,13 @@ void sdlPollEvents()
           layerEnable = DISPCNT & layerSettings;
         }
         break;
+
+      case SDLK_0:
+    	  fprintf(stderr,"ROM selector ...");
+    	  stopState = true;
+    	  RomLoad( PBROM.getRomNext() );
+    	  break;
+
       case SDLK_n:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)) {
@@ -2195,7 +2260,6 @@ int main(int argc, char **argv)
       fprintf(stderr,"%s :%s: File name too long\n",argv[0],szFile);
       exit(-1);
     }
-/*
 
      utilStripDoubleExtension(szFile, filename);
      char *p = strrchr(filename, '.');
@@ -2226,20 +2290,18 @@ int main(int argc, char **argv)
       sdl_patch_num++;
     }
 
-*/
     fprintf(stderr,"soundInit..\n");
     soundInit();
 
     bool failed = false;
-
-    fprintf(stderr,"szFile = %s\n", szFile);
 
     if(strlen(szFile) <= 4)
     {
       fprintf(stderr," ROM file is invalid ...\n");
       exit(-1);
     }
-     IMAGE_TYPE type = utilFindType(szFile);
+   //  IMAGE_TYPE type = utilFindType(szFile);
+     IMAGE_TYPE type = IMAGE_GBA;
 
      fprintf(stderr,"'%s' type = %d\n",szFile, type);
 
@@ -2437,6 +2499,7 @@ int main(int argc, char **argv)
   }
 
   fprintf(stderr,"GO emu loop!\n");
+  systemMessage(1,"froggyface tbotz.blogspot.com");
 
   while(emulating) {
     if(!paused && active) {

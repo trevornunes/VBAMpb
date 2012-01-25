@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <emulation version="1">
 
-<dpad x="10" y="120" width="32" height="32">
-<label x="0" y="0" width="32" height="32" image="dpad.png"/>
+<dpad x="2" y="116" width="40" height="40">
+<label x="0" y="0" width="40" height="40" image="dpad.png"/>
 </dpad>
 
-<key x="90" y="124" width="30" height="30" sym="8" scancode="8">
-<label x="0" y="0" width="30" height="30" image="select.png"/>
+<key x="92" y="134" width="16" height="16" sym="8" scancode="8">
+<label x="0" y="0" width="16" height="16" image="select.png"/>
 </key>
 
-<key x="120" y="124" width="30" height="30" sym="13" scancode="13">
-<label x="0" y="0" width="30" height="30" image="start.png"/>
+<key x="110" y="134" width="16" height="16" sym="13" scancode="13">
+<label x="0" y="0" width="16" height="16" image="start.png"/>
 </key>
 
 <key x="190" y="134" width="16" height="16" sym="120" scancode="120">
@@ -21,14 +21,22 @@
 <label x="0" y="0" width="16" height="16" image="A.png"/>
 </key>
 
-<key x="210" y="104" width="16" height="16" sym="115" scancode="122">
+<key x="210" y="108" width="16" height="16" sym="115" scancode="122">
 <label x="0" y="0" width="16" height="16" image="A.png"/>
 </key>
 
-<key x="190" y="104" width="16" height="16" sym="97" scancode="120">
+<key x="190" y="108" width="16" height="16" sym="97" scancode="120">
 <label x="0" y="0" width="16" height="16" image="B.png"/>
 </key>
 
-<key x="0" y="0" width="25" height="25" sym="48" scancode="48"/>
+<key x="0" y="0" width="32" height="32" sym="48" scancode="48"/>
+
+<key x="90" y="0" width="16" height="16" sym="289" scancode="289">
+<label x="0" y="0" width="16" height="16" image="gba-icon.png"/>
+</key>
+
+<key x="120" y="0" width="16" height="16" sym="290" scancode="290">
+<label x="0" y="0" width="16" height="16" image="gba-icon.png"/>
+</key>
 
 </emulation>

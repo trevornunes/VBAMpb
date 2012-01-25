@@ -1,5 +1,17 @@
 VBAMpb Blackberry Port of VBA-M GBA/GB/GBC emulator
 
+misc\roms\gba        place unzipped .gba games in here
+                     place gba_bios.bin file here if you wish to play games...
+misc\vbampb\         configuration, saves and other stuff.
+misc\vbampb\tco.xml  override default control interface with your own buttons and layout
+
+
+
+v1.0.0.5
+
+- rom cycling, tap top left
 - FEX is disabled for now, so no zip etc
-- Performance sucks, a few tweaks have been made to get it 100% with framekskip
-  
+- effects are disabled for now like blur etc but not the main filters 
+- audio buffer is 300ms/11khz for now... 
+- Some games stutter with sound, performance issues vary wildly but for
+  the most part they are playable.

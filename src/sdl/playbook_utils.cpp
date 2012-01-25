@@ -50,6 +50,7 @@ PlaybookRom::PlaybookRom(rom_type_t rtype)
 }
 
 
+
 //*********************************************************
 //
 //*********************************************************
@@ -115,8 +116,11 @@ vector<string> PlaybookRom::getRomList( void )
 		  if( (tmp.substr(tmp.find_last_of(".") + 1) == "nes") ||
 			  (tmp.substr(tmp.find_last_of(".") + 1) == "NES") ||
 			  (tmp.substr(tmp.find_last_of(".") + 1) == "gba") ||
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "GBA") ||
 			  (tmp.substr(tmp.find_last_of(".") + 1) == "pce") ||
-			  (tmp.substr(tmp.find_last_of(".") + 1) == "zip") )
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "PCE") ||
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "zip") ||
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "ZIP") )
 		  {
 	          fprintf(stderr,"ROM: %s\n", direntp->d_name);
 			  activeRomList_vsm.push_back(direntp->d_name);

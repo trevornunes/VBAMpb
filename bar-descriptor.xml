@@ -19,7 +19,7 @@
          Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.
          An updated version of application must have a versionNumber value higher than the previous version. Required. -->
     <versionNumber>1.0.0</versionNumber>
-    <buildId>4</buildId>
+    <buildId>5</buildId>
 
     <!-- Fourth digit segment of the package version. First three segments are taken from the 
          <versionNumber> element.  Must be an integer from 0 to 2^16-1 -->
@@ -29,7 +29,6 @@
 
     <!-- Description, displayed in the BlackBerry Tablet OS application installer.
          May have multiple values for each language. See samples or xsd schema file. Optional. -->
-    <description>The VBAm GBA/GB/GBC emulator</description>
 
     <!-- Copyright information. Optional. -->
     <!-- <copyright></copyright> -->
@@ -37,6 +36,7 @@
     <!--  Name of author which is used for signing. Must match the developer name of your development certificate. -->
     <author>t</author>
     <authorId>gYAAgOKRaqVbNM5ToziNoZFV720</authorId>
+    <description>Gameboy Advance Emulator</description>
     
     <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
     <!-- <authorId>ABC1234YjsnUk235h</authorId> -->
@@ -74,10 +74,8 @@
     <asset path="media/B.png">B.png</asset>
     <asset path="media/select.png">select.png</asset>
     <asset path="media/start.png">start.png</asset>
-    <asset path="media/nes.png">nes.png</asset>
     <asset path="3rdparty/libs/libSDL12.so" type="Qnx/Elf">lib/libSDL12.so</asset>
     <asset path="3rdparty/libs/libTouchControlOverlay.so" type="Qnx/Elf">lib/libTouchControlOverlay.so</asset>
-    <asset path="media/gba_froggy.png">gba_froggy.png</asset>
     <asset path="media/gba_froggy_icon.png">gba_froggy_icon.png</asset>
     <asset path="media/dpad.png">dpad.png</asset>
     

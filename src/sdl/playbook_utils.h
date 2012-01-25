@@ -36,7 +36,7 @@ const char    *getRomNext(void);
 void           updateRomList(void);
 void           setRomPath(string path);
 string         getRomPath() { return activeRomPath_m; };
-string         getActiveRom() { return activeRom_m; };
+string         getActiveRomName() { return activeRom_m; };
 void           setRomIndex(int idx);
 private:
 

@@ -1326,7 +1326,9 @@ void CPUCleanUp()
 
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
+#ifndef __QNXNTO__
   emulating = 0;
+#endif
 }
 
 int CPULoadRom(const char *szFile)
