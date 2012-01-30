@@ -171,7 +171,7 @@ char batteryDir[2048];
 char* homeDir = NULL;
 
 // Directory within homedir to use for default save location.
-#define DOT_DIR "vbam"
+#define DOT_DIR "vbampb"
 
 static char *rewindMemory = NULL;
 static int *rewindSerials = NULL;
@@ -1563,6 +1563,7 @@ void sdlPollEvents()
 		}
 	}
 	break;
+	/*
       case SDLK_KP_DIVIDE:
         sdlChangeVolume(-0.1);
         break;
@@ -1608,7 +1609,7 @@ void sdlPollEvents()
           systemScreenMessage("Surround on");
         }
         break;
-
+*/
       case SDLK_p:
         if(!(event.key.keysym.mod & MOD_NOCTRL) &&
            (event.key.keysym.mod & KMOD_CTRL)) {
@@ -2620,9 +2621,9 @@ void drawSpeed(u8 *screen, int pitch, int x, int y)
 void systemDrawScreen()
 {
   unsigned int destPitch = destWidth * (systemColorDepth >> 3);
-  u8 *screen;
+  static u8 *screen = (u8*)surface->pixels;
 
-  renderedFrames++;
+ // renderedFrames++;
 
 #ifndef NO_OGL
   if (openGL)
@@ -2630,7 +2631,7 @@ void systemDrawScreen()
   else
 #endif
   {
-    screen = (u8*)surface->pixels;
+   // screen = (u8*)surface->pixels;
     SDL_LockSurface(surface);
   }
 
@@ -2680,6 +2681,7 @@ void systemDrawScreen()
   }
 #else
   SDL_UnlockSurface(surface);
+  SDL_Delay(1);
   SDL_Flip(surface);
 #endif
 

@@ -3608,6 +3608,7 @@ void CPULoop(int ticks)
 
               u32 ext = (joy >> 10);
               // If no (m) code is enabled, apply the cheats at each LCDline
+#ifndef __QNXNTO__
               if((cheatsEnabled) && (mastercode==0))
                 remainingTicks += cheatsCheckKeys(P1^0x3FF, ext);
               speedup = (ext & 1) ? true : false;
@@ -3618,7 +3619,7 @@ void CPULoop(int ticks)
                 systemScreenCapture(captureNumber);
               }
               capturePrevious = capture;
-
+#endif
               DISPSTAT |= 1;
               DISPSTAT &= 0xFFFD;
               UPDATE_REG(0x04, DISPSTAT);
@@ -3627,12 +3628,12 @@ void CPULoop(int ticks)
                 UPDATE_REG(0x202, IF);
               }
               CPUCheckDMA(1, 0x0f);
-              if(frameCount >= framesToSkip) {
+             if(frameCount >= framesToSkip) {
                 systemDrawScreen();
                 frameCount = 0;
               } else
                 frameCount++;
-              if(systemPauseOnFrame())
+             if(systemPauseOnFrame())
                 ticks = 0;
             }
 

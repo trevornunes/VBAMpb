@@ -113,9 +113,13 @@ vector<string> PlaybookRom::getRomList( void )
 			  continue;
 
 
-		  if( (tmp.substr(tmp.find_last_of(".") + 1) == "nes") ||
+		  if( (tmp.substr(tmp.find_last_of(".") + 1) == "nes") ||  // toupper this sucka!
 			  (tmp.substr(tmp.find_last_of(".") + 1) == "NES") ||
 			  (tmp.substr(tmp.find_last_of(".") + 1) == "gba") ||
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "gb")  ||
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "GB")  ||
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "gbc") ||
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "GBC") ||
 			  (tmp.substr(tmp.find_last_of(".") + 1) == "GBA") ||
 			  (tmp.substr(tmp.find_last_of(".") + 1) == "pce") ||
 			  (tmp.substr(tmp.find_last_of(".") + 1) == "PCE") ||

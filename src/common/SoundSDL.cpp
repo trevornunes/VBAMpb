@@ -50,36 +50,43 @@ void SoundSDL::read(u16 * stream, int length)
 
 void SoundSDL::write(u16 * finalWave, int length)
 {
+	unsigned int samples = length / 4;
+	std::size_t avail;
+
+	/*
 	if (!_initialized)
 		return;
 
 	if (SDL_GetAudioStatus() != SDL_AUDIO_PLAYING)
 		SDL_PauseAudio(0);
 
+*/
 	SDL_mutexP(_mutex);
 
-	unsigned int samples = length / 4;
+	//unsigned int samples = length / 4;
 
-	std::size_t avail;
+	// std::size_t avail;
 	while ((avail = _rbuf.avail() / 2) < samples)
 	{
 		_rbuf.write(finalWave, avail * 2);
 
 		finalWave += avail * 2;
+
 		samples -= avail;
 
 		// If emulating and not in speed up mode, synchronize to audio
 		// by waiting till there is enough room in the buffer
-		if (emulating && !speedup)
-		{
-			SDL_CondWait(_cond, _mutex);
-		}
-		else
-		{
+
+		//if (emulating && !speedup)
+		//{
+	//	SDL_CondWait(_cond, _mutex);
+		//}
+		//else
+	//	{
 			// Drop the remaining of the audio data
 			SDL_mutexV(_mutex);
 			return;
-		}
+		//}
 	}
 
 	_rbuf.write(finalWave, samples * 2);
@@ -95,7 +102,7 @@ bool SoundSDL::init(long sampleRate)
 	audio.format = AUDIO_S16SYS;
 	audio.channels = 2;
 	audio.samples = 1024;
-//	audio.samples = 4096;
+//  audio.samples = 4096; // creates an echo delay stick with 1024!
 	audio.callback = soundCallback;
 	audio.userdata = this;
 
