@@ -85,7 +85,7 @@
 #endif
 
 #ifdef __QNXNTO__
-#include "playbook_utils.h"
+#include "playbookrom.h"
 #endif
 
 extern void remoteInit();
@@ -171,7 +171,7 @@ char batteryDir[2048];
 char* homeDir = NULL;
 
 // Directory within homedir to use for default save location.
-#define DOT_DIR "vbampb"
+#define DOT_DIR ""
 
 static char *rewindMemory = NULL;
 static int *rewindSerials = NULL;
@@ -231,7 +231,7 @@ int sdlFlashSize = 0;
 int sdlAutoPatch = 1;
 int sdlRtcEnable = 0;
 int sdlAgbPrint = 0;
-int sdlMirroringEnable = 0;
+int sdlMirroringEnable = 1;
 
 static int        ignore_first_resize_event = 0;
 
@@ -279,12 +279,14 @@ bool RomLoad( const char *fname)
 
   if( (size=CPULoadRom(fname)) == 0)
   {
-	fprintf(stderr,"RomLoad: error in CPULoadRom for %s",fname);
+	fprintf(stderr,"RomLoad: ERROR loading %s\n",fname);
+    g_LOADING_ROM = 0;
+    load_in_progress = false;
     return false;
   }
 
  // sdlApplyPerImagePreferences();
- // doMirroring(mirroringEnable);
+    doMirroring(mirroringEnable);
 
   cartridgeType = 0;
   emulator = GBASystem;
@@ -307,6 +309,7 @@ bool RomLoad( const char *fname)
   fprintf(stderr,"RomLoad: ok\n");
   load_in_progress = 0;
   systemScreenMessage( PBROM.getActiveRomName().c_str() );
+  return true;
 }
 
 int sdlPreparedCheats	= 0;
@@ -848,7 +851,8 @@ void sdlReadPreferences(FILE *f)
       if(cpuSaveType < 0 || cpuSaveType > 5)
         cpuSaveType = 0;
     } else if(!strcmp(key, "flashSize")) {
-      sdlFlashSize = sdlFromHex(value);
+      // sdlFlashSize = sdlFromHex(value);
+         sdlFlashSize = 1;
       if(sdlFlashSize != 0 && sdlFlashSize != 1)
         sdlFlashSize = 0;
     } else if(!strcmp(key, "ifbType")) {
@@ -1743,7 +1747,13 @@ void sdlPollEvents()
       case SDLK_0:
     	  fprintf(stderr,"ROM selector ...");
     	  stopState = true;
-    	  RomLoad( PBROM.getRomNext() );
+    	  while( RomLoad( PBROM.getRomNext() ) == false )
+    	  {
+    	      fprintf(stderr,"BAD ROM LOAD: %s\n", PBROM.getActiveRomName().c_str() );
+    		  PBROM.setActiveRomBad();
+    	      SDL_Delay(1000);
+    	  }
+
     	  break;
 
       case SDLK_n:
@@ -2003,7 +2013,7 @@ int main(int argc, char **argv)
   char *vbaPath = "/accounts/1000/shared/misc/vbampb";
 
   mkdir("/accounts/1000/shared/misc/roms/gba",0777);
-  mkdir("/accounts/1000/shared/misc/vbam",0777);
+  mkdir(vbaPath,0777);
 
   homeDir = vbaPath;
   useBios = true;
@@ -2011,8 +2021,8 @@ int main(int argc, char **argv)
   snprintf(buf, 1024, "%s/%s", homeDir, DOT_DIR);
   // Make dot dir if not existent
 
-  if (stat(buf, &s) == -1 || !S_ISDIR(s.st_mode))
-      mkdir(buf, 0755);
+//  if (stat(buf, &s) == -1 || !S_ISDIR(s.st_mode))
+//      mkdir(buf, 0755);
 #endif
 
   sdlReadPreferences();
@@ -2301,8 +2311,9 @@ int main(int argc, char **argv)
       fprintf(stderr," ROM file is invalid ...\n");
       exit(-1);
     }
-   //  IMAGE_TYPE type = utilFindType(szFile);
-     IMAGE_TYPE type = IMAGE_GBA;
+
+     IMAGE_TYPE type = utilFindType(szFile);
+     // IMAGE_TYPE type = IMAGE_GBA;
 
      fprintf(stderr,"'%s' type = %d\n",szFile, type);
 

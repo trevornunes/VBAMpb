@@ -468,14 +468,15 @@ IMAGE_TYPE utilFindType(const char *file, char (&buffer)[2048])
 //	}
 	free(file_conv);
 #else
-//	if ( !utilIsImage( file ) ) // TODO: utilIsArchive() instead?
-//	{
+	if ( !utilIsImage( file ) ) // TODO: utilIsArchive() instead?
+	{
+		fprintf(stderr,"scan_arc could be archived image...\n");
 		fex_t* fe = scan_arc(file,utilIsImage,buffer);
 		if(!fe)
 			return IMAGE_UNKNOWN;
 		fex_close(fe);
 		file = buffer;
-//	}
+	}
 #endif
 	return utilIsGBAImage(file) ? IMAGE_GBA : IMAGE_GB;
 }

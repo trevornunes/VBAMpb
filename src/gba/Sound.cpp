@@ -48,13 +48,13 @@ static u16   soundFinalWave [1600];
 long  soundSampleRate    = 11025;
 bool  soundInterpolation = true;
 bool  soundPaused        = true;
-float soundFiltering     = 0.5f;
+float soundFiltering     = 0.5f; // 0.5f
 int   SOUND_CLOCK_TICKS  = SOUND_CLOCK_TICKS_;
 int   soundTicks         = SOUND_CLOCK_TICKS_;
 
 static float soundVolume     = 1.0f;
 static int soundEnableFlag   = 0x3ff; // emulator channels enabled
-static float soundFiltering_ = -1;
+static float soundFiltering_ = -1; // -1
 static float soundVolume_    = -1;
 
 void interp_rate() { /* empty for now */ }

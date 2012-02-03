@@ -24,7 +24,9 @@
 	fex_gz_type,\
 	fex_zip_type,
 #else
-#define FEX_TYPE_LIST
+#define FEX_TYPE_LIST \
+	fex_zip_type,\
+	fex_gz_type,
 #endif
 
 

@@ -16,7 +16,7 @@
 //#define BLARGG_BIG_ENDIAN 1
 
 // Uncomment to use zlib for transparent decompression of gzipped files
-//#define HAVE_ZLIB_H
+#define HAVE_ZLIB_H
 
 // Uncomment if you get errors in the bool section of blargg_common.h
 //#define BLARGG_COMPILER_HAS_BOOL 1

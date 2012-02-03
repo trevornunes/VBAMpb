@@ -160,7 +160,7 @@ saveType=0
 
 # Flash size
 # 0=64K Flash, 1=128K Flash
-flashSize=0
+flashSize=128
 
 # Sound volume
 # 0-200=0%-200%

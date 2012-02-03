@@ -69,24 +69,24 @@ void SoundSDL::write(u16 * finalWave, int length)
 	while ((avail = _rbuf.avail() / 2) < samples)
 	{
 		_rbuf.write(finalWave, avail * 2);
-
 		finalWave += avail * 2;
-
 		samples -= avail;
 
 		// If emulating and not in speed up mode, synchronize to audio
 		// by waiting till there is enough room in the buffer
 
-		//if (emulating && !speedup)
-		//{
-	//	SDL_CondWait(_cond, _mutex);
-		//}
-		//else
-	//	{
+#ifndef __QNXNTO__  // forced sync is glitchy .. need performance improvements...
+		if (emulating && !speedup)
+		{
+	  	  SDL_CondWait(_cond, _mutex);
+		}
+		else
+#endif
+		{
 			// Drop the remaining of the audio data
-			SDL_mutexV(_mutex);
-			return;
-		//}
+	        SDL_mutexV(_mutex);
+            return;
+		}
 	}
 
 	_rbuf.write(finalWave, samples * 2);
