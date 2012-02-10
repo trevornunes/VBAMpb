@@ -21,7 +21,7 @@ extern int emulating;
 extern bool speedup;
 
 // Hold up to 100 ms of data in the ring buffer
-const float SoundSDL::_delay = 0.3f;
+const float SoundSDL::_delay = 0.300f;
 
 SoundSDL::SoundSDL():
 	_rbuf(0),
@@ -48,7 +48,7 @@ void SoundSDL::read(u16 * stream, int length)
 	SDL_mutexV(_mutex);
 }
 
-void SoundSDL::write(u16 * finalWave, int length)
+inline void SoundSDL::write(u16 * finalWave, int length)
 {
 	unsigned int samples = length / 4;
 	std::size_t avail;
@@ -75,18 +75,18 @@ void SoundSDL::write(u16 * finalWave, int length)
 		// If emulating and not in speed up mode, synchronize to audio
 		// by waiting till there is enough room in the buffer
 
-#ifndef __QNXNTO__  // forced sync is glitchy .. need performance improvements...
-		if (emulating && !speedup)
-		{
-	  	  SDL_CondWait(_cond, _mutex);
-		}
-		else
+#ifdef __QNXNTO__  // forced sync is glitchy .. need performance improvements...
+	//	if (emulating && !speedup)
+//		{
+ //   SDL_CondWait(_cond, _mutex);
+	//	}
+//		else
 #endif
-		{
+//		{
 			// Drop the remaining of the audio data
-	        SDL_mutexV(_mutex);
-            return;
-		}
+	      SDL_mutexV(_mutex);
+           return;
+//		}
 	}
 
 	_rbuf.write(finalWave, samples * 2);

@@ -126,14 +126,15 @@ int systemFrameSkip = 0;
 int systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
 int srcPitch = 0;
-int srcWidth =  320;
-int srcHeight = 256;
+int srcWidth =  0;
+int srcHeight = 0;
 int destWidth = 0;
 int destHeight = 0;
 int desktopWidth = 0;
 int desktopHeight = 0;
 
 Filter filter = kStretch1x;
+
 
 u8 *delta = NULL;
 
@@ -211,15 +212,15 @@ extern int autoFireMaxCount;
 #define _stricmp strcasecmp
 
 bool wasPaused = false;
-int autoFrameSkip = 0;
-int frameskipadjust = 0;
+int autoFrameSkip = 1;
+int frameskipadjust = 1;
 int showRenderedFrames = 0;
 int renderedFrames = 0;
 
 u32 throttleLastTime = 0;
 u32 autoFrameSkipLastTime = 0;
 
-int showSpeed = 1;
+int showSpeed =0;
 int showSpeedTransparent = 1;
 bool disableStatusMessages = false;
 bool paused = false;
@@ -227,7 +228,7 @@ bool pauseNextFrame = false;
 bool debugger = false;
 bool debuggerStub = false;
 int fullscreen = 1;
-int sdlFlashSize = 0;
+int sdlFlashSize = 1;
 int sdlAutoPatch = 1;
 int sdlRtcEnable = 0;
 int sdlAgbPrint = 0;
@@ -256,6 +257,12 @@ char *arg0;
 PlaybookRom  PBROM(PlaybookRom::rom_gba_c);
 
 
+
+
+static u8 *screen;
+unsigned int destPitch;
+
+
 int g_LOADING_ROM;
 extern bool stopState;  // cpu loop control
 bool RomLoad( const char *fname)
@@ -272,6 +279,7 @@ bool RomLoad( const char *fname)
 
   g_LOADING_ROM = 1;
   stopState = true;
+
 
   load_in_progress = 1;
   CPUCleanUp();         // free dynamic allocated mem etc.
@@ -294,7 +302,7 @@ bool RomLoad( const char *fname)
   fprintf(stderr,"RomLoad: CPUInit '%s' %d\n", biosFileName, useBios);
 
   stopState = false;
-  CPUInit(biosFileName, 1);
+   CPUInit(biosFileName, 1);
 
   /*
   int patchnum;
@@ -308,7 +316,9 @@ bool RomLoad( const char *fname)
   CPUReset();
   fprintf(stderr,"RomLoad: ok\n");
   load_in_progress = 0;
-  systemScreenMessage( PBROM.getActiveRomName().c_str() );
+
+
+  drawText(screen, destPitch, 40, 150, PBROM.getActiveRomName().c_str(), 0);
   return true;
 }
 
@@ -1199,7 +1209,8 @@ void sdlWriteBattery()
 
   emulator.emuWriteBattery(buffer);
 
-  systemScreenMessage("Wrote battery");
+  systemScreenMessage("battery save");
+  systemScreenMessage( PBROM.getActiveRomName().c_str() );
 }
 
 void sdlReadBattery()
@@ -1236,7 +1247,10 @@ void sdlInitVideo() {
   filter_enlarge = getFilterEnlargeFactor(filter);
 
   destWidth  = filter_enlarge * srcWidth;
-  destHeight = filter_enlarge * srcHeight;
+ destHeight =  filter_enlarge * srcHeight;
+
+ //  destWidth =   srcWidth ;
+ //  destHeight =  srcHeight;
 
 #ifndef __QNXNTO__
   flags = SDL_ANYFORMAT | (fullscreen ? SDL_FULLSCREEN : 0);
@@ -1254,10 +1268,11 @@ void sdlInitVideo() {
     screenHeight = destHeight;
   }
 #else
- flags = SDL_HWSURFACE | SDL_HWPALETTE | SDL_DOUBLEBUF;
+ flags = SDL_HWSURFACE | SDL_HWPALETTE | SDL_ASYNCBLIT ;
 
- screenWidth  = destWidth;
- screenHeight = destHeight;
+
+ screenWidth  = srcWidth;
+ screenHeight = srcHeight;
 
  fprintf(stderr,"sdlInitVideo: %d x %d\n", screenWidth, screenHeight);
 #endif
@@ -1548,24 +1563,26 @@ void sdlPollEvents()
 	}
 	break;
 
-      case SDLK_s:
-        if(!(event.key.keysym.mod & MOD_NOCTRL) &&
-           (event.key.keysym.mod & KMOD_CTRL)
-	) {
-		if (sdlSoundToggledOff) { // was off
+      case SDLK_o:
+     //   if(!(event.key.keysym.mod & MOD_NOCTRL) &&
+     //      (event.key.keysym.mod & KMOD_CTRL)
+//	) {
+		  if (sdlSoundToggledOff) { // was off
 			// restore saved state
 			soundSetEnable( sdlSoundToggledOff );
 			sdlSoundToggledOff = 0;
 			systemConsoleMessage("Sound toggled on");
-		} else { // was on
+		  }
+		  else
+		  { // was on
 			sdlSoundToggledOff = soundGetEnable();
 			soundSetEnable( 0 );
 			systemConsoleMessage("Sound toggled off");
 			if (!sdlSoundToggledOff) {
 				sdlSoundToggledOff = 0x3ff;
 			}
-		}
-	}
+		  }
+//	}
 	break;
 	/*
       case SDLK_KP_DIVIDE:
@@ -1621,7 +1638,7 @@ void sdlPollEvents()
           SDL_PauseAudio(paused);
           if(paused)
             wasPaused = true;
-	  systemConsoleMessage(paused?"Pause on":"Pause off");
+   	       systemConsoleMessage(paused?"Pause on":"Pause off");
         }
         break;
       case SDLK_ESCAPE:
@@ -1635,8 +1652,8 @@ void sdlPollEvents()
         }
         break;
       case SDLK_g:
-        if(!(event.key.keysym.mod & MOD_NOCTRL) &&
-           (event.key.keysym.mod & KMOD_CTRL)) {
+     //   if(!(event.key.keysym.mod & MOD_NOCTRL) &&
+      //     (event.key.keysym.mod & KMOD_CTRL)) {
 		      filterFunction = 0;
 		      while (!filterFunction)
 		      {
@@ -1646,7 +1663,7 @@ void sdlPollEvents()
 		      if (getFilterEnlargeFactor(filter) != filter_enlarge)
 		        sdlInitVideo();
 		      systemScreenMessage(getFilterName(filter));
-        }
+      //  }
         break;
       case SDLK_F11:
 #ifndef __QNXNTO__
@@ -1753,7 +1770,7 @@ void sdlPollEvents()
     		  PBROM.setActiveRomBad();
     	      SDL_Delay(1000);
     	  }
-
+    	  systemScreenMessage( PBROM.getActiveRomName().c_str() );
     	  break;
 
       case SDLK_n:
@@ -2007,18 +2024,24 @@ int main(int argc, char **argv)
   char buf[1024];
   struct stat s;
 
+  PBROM.setRomIndex(2); // otherwise we will load the first automatically load game
+                        // twice.
+
+
 #ifndef _WIN32
   // Get home dir
 
-  char *vbaPath = "/accounts/1000/shared/misc/vbampb";
+  mkdir("/accounts/1000/shared/misc/roms",0777);
 
+  char *vbaPath = "/accounts/1000/shared/misc/vbampb";
   mkdir("/accounts/1000/shared/misc/roms/gba",0777);
   mkdir(vbaPath,0777);
 
   homeDir = vbaPath;
   useBios = true;
   strcpy(biosFileName, "/accounts/1000/shared/misc/roms/gba/gba_bios.bin");
-  snprintf(buf, 1024, "%s/%s", homeDir, DOT_DIR);
+
+//  snprintf(buf, 1024, "%s/%s", homeDir, DOT_DIR);
   // Make dot dir if not existent
 
 //  if (stat(buf, &s) == -1 || !S_ISDIR(s.st_mode))
@@ -2313,7 +2336,6 @@ int main(int argc, char **argv)
     }
 
      IMAGE_TYPE type = utilFindType(szFile);
-     // IMAGE_TYPE type = IMAGE_GBA;
 
      fprintf(stderr,"'%s' type = %d\n",szFile, type);
 
@@ -2371,10 +2393,11 @@ int main(int argc, char **argv)
       }
     }
 
-    if(failed) {
+    if(failed)
+    {
       systemMessage(0, "Failed to load file %s", szFile);
-      exit(-1);
     }
+
   } else {
     soundInit();
     cartridgeType = 0;
@@ -2444,6 +2467,7 @@ int main(int argc, char **argv)
     srcWidth = 320;
     srcHeight = 240;
   }
+
 
   fprintf(stderr,"initialize video mode ...\n");
   sdlReadDesktopVideoMode();
@@ -2629,10 +2653,11 @@ void drawSpeed(u8 *screen, int pitch, int x, int y)
   drawText(screen, pitch, x, y, buffer, showSpeedTransparent);
 }
 
+
 void systemDrawScreen()
 {
   unsigned int destPitch = destWidth * (systemColorDepth >> 3);
-  static u8 *screen = (u8*)surface->pixels;
+ static u8 *screen = (u8*) surface->pixels;
 
  // renderedFrames++;
 
@@ -2643,24 +2668,22 @@ void systemDrawScreen()
 #endif
   {
    // screen = (u8*)surface->pixels;
-    SDL_LockSurface(surface);
+ //   SDL_LockSurface(surface);
   }
 
-#ifndef __QNXNTO__
-  // froggyface - temporary don't need blur etc for now ...
+/*
   if (ifbFunction)
     ifbFunction(pix + srcPitch, srcPitch, srcWidth, srcHeight);
-#endif
-
+*/
   filterFunction(pix + srcPitch, srcPitch, delta, screen,
                  destPitch, srcWidth, srcHeight);
 
-  drawScreenMessage(screen, destPitch, 10, destHeight - 20, 3000);
+//  drawScreenMessage(screen, destPitch, 10, destHeight - 20, 3000);
 
-#ifndef __QNXNTO__
-  if (showSpeed && fullscreen)
-    drawSpeed(screen, destPitch, 10, 20);
-#endif
+//#ifndef __QNXNTO__
+//  if (showSpeed && fullscreen)
+ //   drawSpeed(screen, destPitch, 10, 20);
+//#endif
 
 #ifndef NO_OGL
   if (openGL) {
@@ -2691,8 +2714,8 @@ void systemDrawScreen()
     SDL_Flip(surface);
   }
 #else
-  SDL_UnlockSurface(surface);
-  SDL_Delay(1);
+ // SDL_UnlockSurface(surface);
+  //SDL_Delay(1);
   SDL_Flip(surface);
 #endif
 

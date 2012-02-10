@@ -45,7 +45,7 @@ extern bool stopState;      // TODO: silence sound when true
 int const SOUND_CLOCK_TICKS_ = 167772; // 1/100 second
 
 static u16   soundFinalWave [1600];
-long  soundSampleRate    = 11025;
+long  soundSampleRate    = 22050;
 bool  soundInterpolation = true;
 bool  soundPaused        = true;
 float soundFiltering     = 0.5f; // 0.5f
@@ -356,10 +356,10 @@ void flush_samples(Multi_Buffer * buffer)
 	// that don't use the length parameter of the write method.
 	// TODO: Update the Win32 audio drivers (DS, OAL, XA2), and flush all the
 	// samples at once to help reducing the audio delay on all platforms.
-	int soundBufferLen = ( soundSampleRate / 60 ) * 4;
+	 int soundBufferLen = ( soundSampleRate / 60 ) * 4;
 
 	// soundBufferLen should have a whole number of sample pairs
-	assert( soundBufferLen % (2 * sizeof *soundFinalWave) == 0 );
+	//assert( soundBufferLen % (2 * sizeof *soundFinalWave) == 0 );
 
 	// number of samples in output buffer
 	int const out_buf_size = soundBufferLen / sizeof *soundFinalWave;
@@ -372,7 +372,7 @@ void flush_samples(Multi_Buffer * buffer)
 			soundResume();
 
 		soundDriver->write(soundFinalWave, soundBufferLen);
-		systemOnWriteDataToSoundBuffer(soundFinalWave, soundBufferLen);
+		//systemOnWriteDataToSoundBuffer(soundFinalWave, soundBufferLen);
 	}
 }
 

@@ -19,7 +19,7 @@
          Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.
          An updated version of application must have a versionNumber value higher than the previous version. Required. -->
     <versionNumber>1.0.0</versionNumber>
-    <buildId>7</buildId>
+    <buildId>9</buildId>
 
     <!-- Fourth digit segment of the package version. First three segments are taken from the 
          <versionNumber> element.  Must be an integer from 0 to 2^16-1 -->
@@ -36,6 +36,9 @@
     <!--  Name of author which is used for signing. Must match the developer name of your development certificate. -->
     <author>t</author>
     <authorId>gYAAgOKRaqVbNM5ToziNoZFV720</authorId>
+    <icon>
+       <image>gba-icon.png.png</image>
+    </icon>
     <description>Gameboy Advance Emulator</description>
     
     <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
@@ -70,21 +73,18 @@
        <asset path="Simulator-Coverage/VBAMpb" entry="true" type="Qnx/Elf">VBAMpb</asset>
     </configuration>
     <asset path="sdl-controls.xml">sdl-controls.xml</asset>
-    <asset path="media/A.png">A.png</asset>
-    <asset path="media/B.png">B.png</asset>
-    <asset path="media/select.png">select.png</asset>
-    <asset path="media/start.png">start.png</asset>
     <asset path="3rdparty/libs/libSDL12.so" type="Qnx/Elf">lib/libSDL12.so</asset>
     <asset path="3rdparty/libs/libTouchControlOverlay.so" type="Qnx/Elf">lib/libTouchControlOverlay.so</asset>
-    <asset path="media/gba_froggy_icon.png">gba_froggy_icon.png</asset>
-    <asset path="media/dpad.png">dpad.png</asset>
-    <asset path="${QNX_TARGET}\..\target-override\armle-v7\usr\lib\libbps.so" type="Qnx/Elf">lib/libbps.so.1</asset>
     <asset path="${workspace_loc:/pbrom/Device-Release/libpbrom.so}" type="Qnx/Elf">lib/libpbrom.so</asset>
+    <asset path="media/gba-icon.png.png">gba-icon.png.png</asset>
+    <asset path="media/gba_A.png">gba_A.png</asset>
+    <asset path="media/gba_B.png">gba_B.png</asset>
+    <asset path="media/select.png">select.png</asset>
+    <asset path="media/dpad_pce.png">dpad_pce.png</asset>
+    <asset path="media/gba_dpad.png">gba_dpad.png</asset>
+    <asset path="${QNX_TARGET}\..\target-override\armle-v7\usr\lib\libbps.so.1" type="Qnx/Elf">lib/libbps.so.1</asset>
     
     <!--  The icon for the application, which should be 86x86. -->
-    <icon>
-        <image>gba_froggy_icon.png</image>
-    </icon>
     
     <!--  The splash screen that will appear when your application is launching. Should be 1024x600. -->
     <!-- <splashscreen></splashscreen> -->
@@ -92,7 +92,6 @@
     <!-- Request permission to execute native code.  Required for native applications. -->
     <action system="true">run_native</action>
     <action>access_shared</action>
-    <action>access_internet</action>
     <action>set_audio_volume</action>
     <action>play_audio</action>
     

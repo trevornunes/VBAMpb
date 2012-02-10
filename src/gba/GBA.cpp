@@ -1333,6 +1333,8 @@ void CPUCleanUp()
 
 int CPULoadRom(const char *szFile)
 {
+  fprintf(stderr,"CPULoadRom\n");
+
   romSize = 0x2000000;
   if(rom != NULL) {
     CPUCleanUp();
@@ -1340,8 +1342,10 @@ int CPULoadRom(const char *szFile)
 
   systemSaveUpdateCounter = SYSTEM_SAVE_NOT_UPDATED;
 
+  fprintf(stderr,"CPULoadRom: malloc ROM block\n");
   rom = (u8 *)malloc(0x2000000);
   if(rom == NULL) {
+	fprintf(stderr,"critical malloc failed! \n");
     systemMessage(MSG_OUT_OF_MEMORY, N_("Failed to allocate memory for %s"),
                   "ROM");
     return 0;
@@ -3024,24 +3028,30 @@ void CPUInit(const char *biosFileName, bool useBiosFile)
       WRITE32LE(&myROM[i], myROM[i]);
     }
     cpuBiosSwapped = true;
-  }
 #endif
   gbaSaveType = 0;
   eepromInUse = 0;
   saveType = 0;
   useBios = false;
+  static int load_bios_once = 0;
 
-  if(useBiosFile) {
-    int size = 0x4000;
-    if(utilLoad(biosFileName,
+  if(!load_bios_once)
+  {
+    if(useBiosFile)
+    {
+  	 load_bios_once = 1;
+     int size = 0x4000;
+     if(utilLoad(biosFileName,
                 CPUIsGBABios,
                 bios,
-                size)) {
+                size))
+     {
       if(size == 0x4000)
         useBios = true;
       else
         systemMessage(MSG_INVALID_BIOS_FILE_SIZE, N_("Invalid BIOS file size"));
-    }
+     }
+   }  // useBiosFile
   }
 
   if(!useBios) {
@@ -3114,7 +3124,9 @@ void CPUInit(const char *biosFileName, bool useBiosFile)
 
 void CPUReset()
 {
-  if(gbaSaveType == 0) {
+ fprintf( stderr,"CPUReset\n");
+
+	if(gbaSaveType == 0) {
     if(eepromInUse)
       gbaSaveType = 3;
     else
@@ -3568,6 +3580,7 @@ void CPULoop(int ticks)
               if((count % 10) == 0) {
                 system10Frames(60);
               }
+              /*
               if(count == 60) {
                 u32 time = systemGetClock();
                 if(time != lastTime) {
@@ -3578,6 +3591,7 @@ void CPULoop(int ticks)
                 lastTime = time;
                 count = 0;
               }
+              */
               u32 joy = 0;
               // update joystick information
               if(systemReadJoypads())
