@@ -1,7 +1,7 @@
 VBAMpb Blackberry Port of VBA-M GBA/GB/GBC emulator
 
 misc\roms\gba        place unzipped .gba games in here
-                     place gba_bios.bin file here if you wish to play games...
+misc\vbampb\bios     place gba_bios.bin file here if you wish to play games...
 misc\vbampb\         configuration, saves and other stuff.
 misc\vbampb\tco.xml  override default control interface with your own buttons and layout
 
