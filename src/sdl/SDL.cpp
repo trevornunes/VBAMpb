@@ -17,12 +17,16 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <stdarg.h>
+#include <pthread.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <cmath>
+#include <fstream>
 #ifdef __APPLE__
     #include <OpenGL/glu.h>
     #include <OpenGL/glext.h>
@@ -32,7 +36,7 @@
     #include <GL/glext.h>
 #endif
 #endif
-
+using namespace std;
 #include <time.h>
 
 #include "../AutoBuild.h"
@@ -51,6 +55,10 @@
 #include "../gb/gbCheats.h"
 #include "../gb/gbSound.h"
 #include "../Util.h"
+#include <bps/dialog.h>
+#include <bps/bps.h>
+#include <bps/event.h>
+#include "..\utils\xstring.h"
 
 #ifndef __QNXNTO__
 #include "debugger.h"
@@ -84,8 +92,13 @@
 #include <lirc/lirc_client.h>
 #endif
 
+#ifdef __PLAYBOOK__
+static pthread_mutex_t loader_mutex = PTHREAD_MUTEX_INITIALIZER;
+static vector<string> vecList;
+vector<string> sortedvecList;
+#endif
 #ifdef __QNXNTO__
-#include "playbookrom.h"
+
 #endif
 
 extern void remoteInit();
@@ -95,6 +108,10 @@ extern void remoteStubSignal(int,int);
 extern void remoteOutput(const char *, u32);
 extern void remoteSetProtocol(int);
 extern void remoteSetPort(int);
+
+char g_runningFile_str[64];
+
+static vector<string> vsList;
 
 struct EmulatedSystem emulator = {
   NULL,
@@ -132,7 +149,7 @@ int destWidth = 0;
 int destHeight = 0;
 int desktopWidth = 0;
 int desktopHeight = 0;
-
+int gameIndex = 0;
 Filter filter = kStretch1x;
 
 
@@ -172,7 +189,7 @@ char batteryDir[2048];
 char* homeDir = NULL;
 
 // Directory within homedir to use for default save location.
-#define DOT_DIR ""
+#define DOT_DIR "savegames"
 
 static char *rewindMemory = NULL;
 static int *rewindSerials = NULL;
@@ -253,18 +270,310 @@ u32  screenMessageTime = 0;
 
 char *arg0;
 
-
-PlaybookRom  PBROM(PlaybookRom::rom_gba_c);
-
-
-
-
 static u8 *screen;
 unsigned int destPitch;
 
 
 int g_LOADING_ROM;
 extern bool stopState;  // cpu loop control
+
+vector<string> GetRomDirListing( const char *dpath )
+
+{
+ //vector<string> vsList;
+
+#ifdef __PLAYBOOK__
+	DIR* dirp;
+	struct dirent* direntp;
+
+#endif
+
+if(!dpath)
+{
+    fprintf(stderr,"dpath is null.\n");
+	return vsList;
+}
+
+#ifdef __PLAYBOOK__
+
+  dirp = opendir( "/accounts/1000/shared/misc/roms/gba/" );
+  if( dirp != NULL )
+  {
+	 for(;;)
+	 {
+		direntp = readdir( dirp );
+		if( direntp == NULL )
+		  break;
+
+		 fprintf(stderr,"FILE: '%s' \n", direntp->d_name);
+		// FCEUI_DispMessage(direntp->d_name,0);
+		  string tmp = direntp->d_name;
+
+		  if( strcmp( direntp->d_name, ".") == 0)
+		  {
+			 continue;
+		  }
+
+		  if( strcmp( direntp->d_name,"..") == 0)
+			  continue;
+
+		  if( (tmp.substr(tmp.find_last_of(".") + 1) == "gba") ||
+			  (tmp.substr(tmp.find_last_of(".") + 1) == "GBA"))
+		  {
+	         // fprintf(stderr,"ROM: %s\n", direntp->d_name);
+			  vsList.push_back(direntp->d_name);
+		  }
+	 }
+ }
+  else
+  {
+	fprintf(stderr,"dirp is NULL ...\n");
+  }
+
+#endif
+ fprintf(stderr,"number of files %d\n", vsList.size() );
+
+ if (vsList.size() == 0) {
+	 dialog_instance_t alert_dialog = 0;
+	 	 dialog_request_events(0);    //0 indicates that all events are requested
+	 	 if (dialog_create_alert(&alert_dialog) != BPS_SUCCESS) {
+	 		 fprintf(stderr, "Failed to create alert dialog.");
+	      //return EXIT_FAILURE;
+	 	 }
+	 	 dialog_set_title_text(alert_dialog, "VBAMpb Error Report");
+	 	 if (dialog_set_alert_html_message_text(alert_dialog, "<u><b>ERROR:</b> You do not have any ROMS!<br></u><b>Add vba ROMS to:</b> <br><u>\"shared/misc/roms/gba\"</u><br>using either <i>WiFi sharing</i> or <i>Desktop Software.</i>")
+	 			 != BPS_SUCCESS) {
+	 		 fprintf(stderr, "Failed to set alert dialog message text.");
+	 		 dialog_destroy(alert_dialog);
+	 		 alert_dialog = 0;
+	        //return EXIT_FAILURE;
+	 	 }
+
+	 	 char* cancel_button_context = "Cancelled";
+
+	 	 if (dialog_add_button(alert_dialog, "OK", true, 0, true)
+	 			 != BPS_SUCCESS) {
+	 		 fprintf(stderr, "Failed to add button to alert dialog.");
+	 		 dialog_destroy(alert_dialog);
+	 		 alert_dialog = 0;
+	        //return EXIT_FAILURE;
+	 	 }
+
+	 	 if (dialog_show(alert_dialog) != BPS_SUCCESS) {
+	 		 fprintf(stderr, "Failed to show alert dialog.");
+	 		 dialog_destroy(alert_dialog);
+	 		 alert_dialog = 0;
+	 		 //return EXIT_FAILURE;
+	 	 }
+
+	 	 while (1) {
+	 		 bps_event_t *event = NULL;
+	 		 bps_get_event(&event, -1);    // -1 means that the function waits
+	                                    // for an event before returning
+
+	 		 if (event) {
+	 			 if (bps_event_get_domain(event) == dialog_get_domain()) {
+
+	 				 int selectedIndex =
+	 						 dialog_event_get_selected_index(event);
+	 				 const char* label =
+	 						 dialog_event_get_selected_label(event);
+	 				 const char* context =
+	 						 dialog_event_get_selected_context(event);
+
+	 				 exit(-1);
+	 			 }
+	 		 }
+	 	 }
+
+	 	 if (alert_dialog) {
+	 		 dialog_destroy(alert_dialog);
+	 	 }
+	  }
+
+ return vsList;
+}
+
+
+
+//
+//
+//
+
+
+vector<string> sortAlpha(vector<string> sortThis)
+{
+     int swap;
+     string temp;
+
+     do
+     {
+         swap = 0;
+         for (int count = 0; count < sortThis.size() - 1; count++)
+         {
+             if (sortThis.at(count) > sortThis.at(count + 1))
+             {
+                   temp = sortThis.at(count);
+                   sortThis.at(count) = sortThis.at(count + 1);
+                   sortThis.at(count + 1) = temp;
+                   swap = 1;
+             }
+         }
+     }while (swap != 0);
+
+     return sortThis;
+}
+
+int AutoLoadRom(void)
+{
+   // static int gameIndex;
+    int status = 0;
+
+    extern void sdlWriteBattery();
+    extern void sdlReadBattery();
+
+    sdlWriteBattery();
+
+    pthread_mutex_lock(&loader_mutex);
+    const char ** list = 0;
+    int count = 0;
+    list = (const char**)malloc(sortedvecList.size()*sizeof(char*));
+
+
+
+    for(;;){
+    	if(count >= sortedvecList.size()) break;
+    	fprintf(stderr, "%d \n", count);
+    	list[count] = sortedvecList[count].c_str();
+    	count++;
+    }
+
+    // ROM selector
+       dialog_instance_t dialog = 0;
+       int i, rc;
+       bps_event_t *event;
+       int domain = 0;
+       const char * label;
+       char romfilename[256];
+       dialog_create_popuplist(&dialog);
+       dialog_set_popuplist_items(dialog, list, sortedvecList.size());
+
+           char* cancel_button_context = "Canceled";
+           char* okay_button_context = "Okay";
+           dialog_add_button(dialog, DIALOG_CANCEL_LABEL, true, cancel_button_context, true);
+           dialog_add_button(dialog, DIALOG_OK_LABEL, true, okay_button_context, true);
+           dialog_set_popuplist_multiselect(dialog, false);
+           dialog_show(dialog);
+
+           while(1){
+               bps_get_event(&event, -1);
+
+               if (event) {
+                   domain = bps_event_get_domain(event);
+                   if (domain == dialog_get_domain()) {
+                       int *response[1];
+                       int num;
+
+                       label = dialog_event_get_selected_label(event);
+
+                       if(strcmp(label, DIALOG_OK_LABEL) == 0){
+                           dialog_event_get_popuplist_selected_indices(event, (int**)response, &num);
+                           if(num != 0){
+                               //*response[0] is the index that was selected
+                               printf("%s", list[*response[0]]);fflush(stdout);
+                               strcpy(romfilename, list[*response[0]]);
+                           }
+                           bps_free(response[0]);
+                       } else {
+                           printf("User has canceled ISO dialog.");
+                           return false;
+                       }
+                       break;
+                   }
+               }
+           }
+
+
+    //test end
+
+	fprintf(stderr,"AutoLoadRom\n");
+    string baseDir ="/accounts/1000/shared/misc/roms/gba/";
+
+    memset(&g_runningFile_str[0],0,64);
+    sprintf(&g_runningFile_str[0], romfilename);
+
+    baseDir = baseDir + romfilename;
+    fprintf(stderr,"loading: %d/%d '%s'\n",gameIndex + 1, sortedvecList.size(), baseDir.c_str() );
+    strcpy(filename, romfilename);
+
+
+    int failed;
+      int size = 0;
+      static int load_in_progress = 0;
+
+      if(load_in_progress)
+    	  return false;
+
+
+
+      g_LOADING_ROM = 1;
+      stopState = true;
+
+
+      load_in_progress = 1;
+      CPUCleanUp();         // free dynamic allocated mem etc.
+      fprintf(stderr,"RomLoad: CPULoadRom\n");
+
+      if( (size=CPULoadRom(baseDir.c_str())) == 0)
+      {
+    	fprintf(stderr,"RomLoad: ERROR loading %s\n",baseDir.c_str());
+        g_LOADING_ROM = 0;
+        load_in_progress = false;
+        return false;
+      }
+
+     // sdlApplyPerImagePreferences();
+        doMirroring(mirroringEnable);
+
+      cartridgeType = 0;
+      emulator = GBASystem;
+
+      fprintf(stderr,"RomLoad: CPUInit '%s' %d\n", biosFileName, useBios);
+
+      stopState = false;
+      CPUInit(biosFileName, 1);
+
+      /*
+      int patchnum;
+      for (patchnum = 0; patchnum < sdl_patch_num; patchnum++) {
+        fprintf(stdout, "Trying patch %s%s\n", sdl_patch_names[patchnum],
+          applyPatch(sdl_patch_names[patchnum], &rom, &size) ? " [success]" : "");
+      }
+      */
+      fprintf(stderr,"RomLoad: CPUReset\n");
+
+      CPUReset();
+      fprintf(stderr,"RomLoad: ok\n");
+      load_in_progress = 0;
+      sdlReadBattery();
+
+
+      //drawText(screen, destPitch, 40, 150, szFile, 0);
+
+
+   pthread_mutex_unlock(&loader_mutex);  // -lpthread normally would be added, it's already in PB runtime.
+
+   free(list);
+   return true;
+}
+
+void UpdateRomList(void)
+{
+  vecList = GetRomDirListing("/accounts/1000/shared/misc/roms/gba");
+  sortedvecList = sortAlpha(vecList);
+}
+
+
 bool RomLoad( const char *fname)
 {
   int failed;
@@ -318,7 +627,6 @@ bool RomLoad( const char *fname)
   load_in_progress = 0;
 
 
-  drawText(screen, destPitch, 40, 150, PBROM.getActiveRomName().c_str(), 0);
   return true;
 }
 
@@ -987,7 +1295,7 @@ void sdlReadPreferences()
 
 static void sdlApplyPerImagePreferences()
 {
-  FILE *f = sdlFindFile("vba-over.ini");
+  FILE *f = sdlFindFile("/accounts/1000/shared/misc/vbampb/vbam-over.ini");
   if(!f) {
     fprintf(stdout, "vba-over.ini NOT FOUND (using emulator settings)\n");
     return;
@@ -1210,7 +1518,7 @@ void sdlWriteBattery()
   emulator.emuWriteBattery(buffer);
 
   systemScreenMessage("battery save");
-  systemScreenMessage( PBROM.getActiveRomName().c_str() );
+
 }
 
 void sdlReadBattery()
@@ -1236,7 +1544,7 @@ void sdlReadDesktopVideoMode() {
   const SDL_VideoInfo* vInfo = SDL_GetVideoInfo();
   desktopWidth  = vInfo->current_w;  // 1024 for pb
   desktopHeight = vInfo->current_h;  // 600  for pb
-  PBROM.updateRomList();
+
 }
 
 void sdlInitVideo() {
@@ -1468,6 +1776,7 @@ void sdlPollEvents()
     switch(event.type) {
     case SDL_QUIT:
       emulating = 0;
+      sdlWriteBattery();
       break;
 #ifndef _QNXNTO__
     case SDL_VIDEORESIZE:
@@ -1763,14 +2072,7 @@ void sdlPollEvents()
 
       case SDLK_0:
     	  fprintf(stderr,"ROM selector ...");
-    	  stopState = true;
-    	  while( RomLoad( PBROM.getRomNext() ) == false )
-    	  {
-    	      fprintf(stderr,"BAD ROM LOAD: %s\n", PBROM.getActiveRomName().c_str() );
-    		  PBROM.setActiveRomBad();
-    	      SDL_Delay(1000);
-    	  }
-    	  systemScreenMessage( PBROM.getActiveRomName().c_str() );
+    	  AutoLoadRom();
     	  break;
 
       case SDLK_n:
@@ -2003,6 +2305,10 @@ int main(int argc, char **argv)
 {
   fprintf(stdout, "VBA-M version %s [SDL]\n", VERSION);
 
+  bps_initialize();
+  dialog_request_events(0);
+  UpdateRomList();
+
   arg0 = argv[0];
 
   captureDir[0] = 0;
@@ -2024,14 +2330,15 @@ int main(int argc, char **argv)
   char buf[1024];
   struct stat s;
 
-  PBROM.setRomIndex(2); // otherwise we will load the first automatically load game
-                        // twice.
 
 
 #ifndef _WIN32
   // Get home dir
 
   mkdir("/accounts/1000/shared/misc/roms",0777);
+  mkdir("/accounts/1000/shared/misc/vbampb", 0777);
+  mkdir("/accounts/1000/shared/misc/vbampb/savegames", 0777);
+  mkdir("/accounts/1000/shared/misc/vbampb/bios", 0777);
 
   char *vbaPath = "/accounts/1000/shared/misc/vbampb";
   mkdir("/accounts/1000/shared/misc/roms/gba",0777);
@@ -2039,8 +2346,21 @@ int main(int argc, char **argv)
 
   homeDir = vbaPath;
   useBios = true;
-  strcpy(biosFileName, "/accounts/1000/shared/misc/roms/gba/gba_bios.bin");
+  strcpy(biosFileName, "/accounts/1000/shared/misc/vbampb/bios/gba_bios.bin");
 
+  ifstream ifile("/accounts/1000/shared/misc/vbampb/vbam-over.ini");
+  	if(!ifile){
+  		ifstream f1("app/native/vba-over.ini", fstream::binary);
+  		ofstream f2("/accounts/1000/shared/misc/vbampb/vbam-over.ini", fstream::trunc|fstream::binary);
+  		f2 << f1.rdbuf();
+  	}
+
+  	ifstream ifile2("/accounts/1000/shared/misc/vbampb/vbam.cfg");
+  	  	if(!ifile2){
+  	  		ifstream f11("app/native/vbam.cfg", fstream::binary);
+  	  		ofstream f22("/accounts/1000/shared/misc/vbampb/vbam.cfg", fstream::trunc|fstream::binary);
+  	  		f22 << f11.rdbuf();
+  	  	}
 //  snprintf(buf, 1024, "%s/%s", homeDir, DOT_DIR);
   // Make dot dir if not existent
 
@@ -2253,18 +2573,7 @@ int main(int argc, char **argv)
   agbPrintEnable(sdlAgbPrint ? true : false);
 
 
-//#ifndef __QNXNTO__
-  if(!debuggerStub) {
-    if(optind >= argc) {
-      systemMessage(0,"Missing image name");
-    //  char *szFile ="/accounts/1000/shared/misc/roms/gba/game.gba";
-     // usage(argv[0]);
-     // exit(-1);
-    }
-  }
-//#else
- //char *szFile ="/accounts/1000/shared/misc/roms/gba/game.gba";
-//#endif
+// FIXME: Rom section here?
 
   for(int i = 0; i < 24;) {
     systemGbPalette[i++] = (0x1f) | (0x1f << 5) | (0x1f << 10);
@@ -2277,16 +2586,82 @@ int main(int argc, char **argv)
 
   if(1) {
 #ifdef __QNXNTO__
-	     PlaybookRom pbrom( PlaybookRom::rom_gba_c );
-	     pbrom.getRomList();
-	   // (void) pbrom.getRomNext();
-	     const char *firstRomName = pbrom.getRomNext();
-	     char *szFile = (char *) firstRomName;
-#else
-	     char *szFile = argv[optind];
-#endif
+	  const char *szFile = 0;
+	  	  const char ** list = 0;
+	  	      int count = 0;
+	  	      list = (const char**)malloc(sortedvecList.size()*sizeof(char*));
 
-    fprintf(stderr,"szFile = %s\n", firstRomName);
+
+
+	  	      for(;;){
+	  	      	if(count >= sortedvecList.size()) break;
+	  	      	fprintf(stderr, "%d \n", count);
+	  	      	list[count] = sortedvecList[count].c_str();
+	  	      	count++;
+	  	      }
+
+	  	      // ROM selector
+	  	         dialog_instance_t dialog = 0;
+	  	         int i, rc;
+	  	         bps_event_t *event;
+	  	         int domain = 0;
+	  	         const char * label;
+	  	         char romfilename[256];
+	  	         dialog_create_popuplist(&dialog);
+	  	         dialog_set_popuplist_items(dialog, list, sortedvecList.size());
+
+	  	             char* cancel_button_context = "Canceled";
+	  	             char* okay_button_context = "Okay";
+	  	             dialog_add_button(dialog, DIALOG_CANCEL_LABEL, true, cancel_button_context, true);
+	  	             dialog_add_button(dialog, DIALOG_OK_LABEL, true, okay_button_context, true);
+	  	             dialog_set_popuplist_multiselect(dialog, false);
+	  	             dialog_show(dialog);
+
+	  	             while(1){
+	  	                 bps_get_event(&event, -1);
+
+	  	                 if (event) {
+	  	                     domain = bps_event_get_domain(event);
+	  	                     if (domain == dialog_get_domain()) {
+	  	                         int *response[1];
+	  	                         int num;
+
+	  	                         label = dialog_event_get_selected_label(event);
+
+	  	                         if(strcmp(label, DIALOG_OK_LABEL) == 0){
+	  	                             dialog_event_get_popuplist_selected_indices(event, (int**)response, &num);
+	  	                             if(num != 0){
+	  	                                 //*response[0] is the index that was selected
+	  	                                 printf("%s", list[*response[0]]);fflush(stdout);
+	  	                                 strcpy(romfilename, list[*response[0]]);
+	  	                             }
+	  	                             bps_free(response[0]);
+	  	                         } else {
+	  	                             printf("User has canceled ISO dialog.");
+	  	                             return false;
+	  	                         }
+	  	                         break;
+	  	                     }
+	  	                 }
+	  	             }
+
+	  	             string baseDir ="/accounts/1000/shared/misc/roms/gba/";
+
+	  	                 memset(&g_runningFile_str[0],0,64);
+	  	                 sprintf(&g_runningFile_str[0], romfilename);
+
+	  	                 baseDir = baseDir + romfilename;
+	  	                 fprintf(stderr,"loading: %d/%d '%s'\n",gameIndex + 1, sortedvecList.size(), baseDir.c_str() );
+	  	                 strcpy(filename, romfilename);
+	  	                 szFile = baseDir.c_str();
+	  	                 fprintf(stderr,"%s",szFile);
+
+	  	                 free(list);
+	  #else
+	  	     char *szFile = argv[optind];
+	  #endif
+
+    fprintf(stderr,"szFile = %s\n", szFile);
 
 	u32 len = strlen(szFile);
     if (len > SYSMSG_BUFFER_SIZE)
@@ -2294,13 +2669,6 @@ int main(int argc, char **argv)
       fprintf(stderr,"%s :%s: File name too long\n",argv[0],szFile);
       exit(-1);
     }
-
-     utilStripDoubleExtension(szFile, filename);
-     char *p = strrchr(filename, '.');
-
-    if(p)
-      *p = 0;
-
 
     if (sdlAutoPatch && sdl_patch_num == 0)
     {
@@ -2345,30 +2713,7 @@ int main(int argc, char **argv)
     }
     cartridgeType = (int)type;
 
-    if(type == IMAGE_GB) {
-      failed = !gbLoadRom(szFile);
-      if(!failed) {
-        gbGetHardwareType();
-
-        // used for the handling of the gb Boot Rom
-        if (gbHardware & 5)
-          gbCPUInit(gbBiosFileName, useBios);
-
-        cartridgeType = IMAGE_GB;
-        emulator = GBSystem;
-        int size = gbRomSize, patchnum;
-        for (patchnum = 0; patchnum < sdl_patch_num; patchnum++) {
-          fprintf(stdout, "Trying patch %s%s\n", sdl_patch_names[patchnum],
-            applyPatch(sdl_patch_names[patchnum], &gbRom, &size) ? " [success]" : "");
-        }
-        if(size != gbRomSize) {
-          extern bool gbUpdateSizes();
-          gbUpdateSizes();
-          gbReset();
-        }
-        gbReset();
-      }
-    } else if(type == IMAGE_GBA) {
+    if(type == IMAGE_GBA) {
 
       fprintf(stderr,"GBA image '%s'\n",szFile);
       int size = CPULoadRom(szFile);

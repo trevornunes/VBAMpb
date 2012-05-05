@@ -18,8 +18,8 @@
     <!-- A string value of the format <0-999>.<0-999>.<0-999> that represents application version which can be used to check for application upgrade. 
          Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.
          An updated version of application must have a versionNumber value higher than the previous version. Required. -->
-    <versionNumber>1.0.0</versionNumber>
-    <buildId>9</buildId>
+    <versionNumber>1.0.1</versionNumber>
+    <buildId>1</buildId>
 
     <!-- Fourth digit segment of the package version. First three segments are taken from the 
          <versionNumber> element.  Must be an integer from 0 to 2^16-1 -->
@@ -75,14 +75,15 @@
     <asset path="sdl-controls.xml">sdl-controls.xml</asset>
     <asset path="3rdparty/libs/libSDL12.so" type="Qnx/Elf">lib/libSDL12.so</asset>
     <asset path="3rdparty/libs/libTouchControlOverlay.so" type="Qnx/Elf">lib/libTouchControlOverlay.so</asset>
-    <asset path="${workspace_loc:/pbrom/Device-Release/libpbrom.so}" type="Qnx/Elf">lib/libpbrom.so</asset>
     <asset path="media/gba-icon.png.png">gba-icon.png.png</asset>
     <asset path="media/gba_A.png">gba_A.png</asset>
     <asset path="media/gba_B.png">gba_B.png</asset>
     <asset path="media/select.png">select.png</asset>
-    <asset path="media/dpad_pce.png">dpad_pce.png</asset>
     <asset path="media/gba_dpad.png">gba_dpad.png</asset>
-    <asset path="${QNX_TARGET}\..\target-override\armle-v7\usr\lib\libbps.so.1" type="Qnx/Elf">lib/libbps.so.1</asset>
+    <asset path="src/vba-over.ini">vba-over.ini</asset>
+    <asset path="src/vbam.cfg">vbam.cfg</asset>
+    <asset path="media/gba_L.png">gba_L.png</asset>
+    <asset path="media/gba_R.png">gba_R.png</asset>
     
     <!--  The icon for the application, which should be 86x86. -->
     

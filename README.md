@@ -5,6 +5,16 @@ misc\roms\gba        place unzipped .gba games in here
 misc\vbampb\         configuration, saves and other stuff.
 misc\vbampb\tco.xml  override default control interface with your own buttons and layout
 
+v1.0.1.1
+
+- Visual Rom Selector, tap top left
+- Save files now work and load.
+- Fixed L + R (was backwards)
+- App now automatically creates and reads in vbam-over.ini
+- App now automatially creates vbam.cfg
+- Bios Dir was changed to misc/vbampb/bios
+- Savegames and savestates save into misc/vbampb/savegames
+- Gameboy Color functionality REMOVED -- Available in Emulator GBColor-pb
 
 
 v1.0.0.5

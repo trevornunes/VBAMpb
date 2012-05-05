@@ -134,7 +134,6 @@
 								<option id="com.qnx.qcc.option.linker.langcpp.1184571269" name="C++ (-lang-c++)" superClass="com.qnx.qcc.option.linker.langcpp" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.linker.libraries.925771453" name="Libraries (-l)" superClass="com.qnx.qcc.option.linker.libraries" valueType="libs">
 									<listOptionValue builtIn="false" value="bps"/>
-									<listOptionValue builtIn="false" value="pbrom"/>
 									<listOptionValue builtIn="false" value="socket"/>
 									<listOptionValue builtIn="false" value="xml2"/>
 									<listOptionValue builtIn="false" value="SDL12"/>
@@ -143,11 +142,10 @@
 									<listOptionValue builtIn="false" value="png"/>
 									<listOptionValue builtIn="false" value="z"/>
 								</option>
-								<option id="com.qnx.qcc.option.linker.security.258666952" name="Enhanced Security (-Wl,-z,relro -Wl,-z,now)" superClass="com.qnx.qcc.option.linker.security" value="true" valueType="boolean"/>
+								<option id="com.qnx.qcc.option.linker.security.258666952" name="Enhanced Security (-Wl,-z,relro -Wl,-z,now)" superClass="com.qnx.qcc.option.linker.security" value="false" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.linker.pie.751354641" name="Position Independent Executable (-pie)" superClass="com.qnx.qcc.option.linker.pie" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.linker.libraryPaths.1991575573" name="Library Paths (-L)" superClass="com.qnx.qcc.option.linker.libraryPaths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="${QNX_TARGET}/../target-override/${CPUVARDIR}/lib"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/pbrom/Device-Release}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SDL12/Device-Release}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TouchControlOverlay/Device-Release}&quot;"/>
 									<listOptionValue builtIn="false" value="${QNX_TARGET}/../target-override/${CPUVARDIR}/usr/lib"/>
@@ -479,8 +477,11 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="VBAMpb.null.1843654320" name="VBAMpb"/>
 	</storageModule>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="1">
+		<resource resourceType="PROJECT" workspacePath="/VBAMpb"/>
+	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="com.qnx.tools.ide.qde.core.QNXProjectProperties"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.qnx.tools.ide.qde.managedbuilder.core.qccScannerInfo"/>
 		<scannerConfigBuildInfo instanceId="com.qnx.qcc.configuration.exe.profile.863743944">
@@ -492,18 +493,17 @@
 		<scannerConfigBuildInfo instanceId="com.qnx.qcc.configuration.exe.release.1789193390">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.qnx.tools.ide.qde.managedbuilder.core.qccScannerInfo"/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.qnx.qcc.configuration.exe.profile.1553894578">
+		<scannerConfigBuildInfo instanceId="com.qnx.qcc.configuration.exe.profile.coverage.997879403">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.qnx.tools.ide.qde.managedbuilder.core.qccScannerInfo"/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="com.qnx.qcc.configuration.exe.debug.807981922">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.qnx.tools.ide.qde.managedbuilder.core.qccScannerInfo"/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.qnx.qcc.configuration.exe.profile.coverage.997879403">
+		<scannerConfigBuildInfo instanceId="com.qnx.qcc.configuration.exe.profile.1553894578">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.qnx.tools.ide.qde.managedbuilder.core.qccScannerInfo"/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="com.qnx.qcc.configuration.exe.debug.804636892">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.qnx.tools.ide.qde.managedbuilder.core.qccScannerInfo"/>
 		</scannerConfigBuildInfo>
 	</storageModule>
-	<storageModule moduleId="com.qnx.tools.ide.qde.core.QNXProjectProperties"/>
 </cproject>

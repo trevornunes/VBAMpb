@@ -6,15 +6,15 @@
 </dpad>
 
 <key x="70" y="120" width="16" height="16" sym="8" scancode="8">
-<label x="0" y="0" width="16" height="16" image="gba_A.png" />
+<label x="0" y="0" width="16" height="16" image="" />
 </key>
 
 <key x="70" y="140" width="16" height="16" sym="13" scancode="13">
-<label x="0" y="0" width="16" height="16" image="start-button.png" />
+<label x="0" y="0" width="16" height="16" image="" />
 </key>
 
 <key x="174" y="114" width="32" height="32" sym="120" scancode="120">
-<label x="0" y="0" width="32" height="32" image="gba_A.png" />
+<label x="0" y="0" width="32" height="32" image="gba_B.png" />
 </key>
 
 <key x="208" y="94" width="32" height="32" sym="122" scancode="122">
@@ -22,12 +22,12 @@
 
 </key>
 
-<key x="10" y="70" width="16" height="16" sym="115" scancode="122">
-<label x="0" y="0" width="16" height="16" image="gba_A.png" />
+<key x="5" y="70" width="16" height="16" sym="97" scancode="120">
+<label x="0" y="0" width="16" height="16" image="gba_L.png" />
 </key>
 
-<key x="220" y="70" width="16" height="16" sym="97" scancode="120">
-<label x="0" y="0" width="16" height="16" image="gba_A.png" />
+<key x="220" y="70" width="16" height="16" sym="115" scancode="122">
+<label x="0" y="0" width="16" height="16" image="gba_R.png" />
 </key>
 
 <key x="0" y="0" width="32" height="32" sym="48" scancode="48">
