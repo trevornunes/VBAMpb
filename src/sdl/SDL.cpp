@@ -2307,7 +2307,7 @@ int main(int argc, char **argv)
 
   bps_initialize();
   dialog_request_events(0);
-  UpdateRomList();
+ 
 
   arg0 = argv[0];
 
@@ -2360,7 +2360,8 @@ int main(int argc, char **argv)
   	  		ifstream f11("app/native/vbam.cfg", fstream::binary);
   	  		ofstream f22("/accounts/1000/shared/misc/vbampb/vbam.cfg", fstream::trunc|fstream::binary);
   	  		f22 << f11.rdbuf();
-  	  	}
+ }
+  UpdateRomList();
 //  snprintf(buf, 1024, "%s/%s", homeDir, DOT_DIR);
   // Make dot dir if not existent
 
